@@ -1,0 +1,137 @@
+﻿@model StudentMarksCalculatorMVC.Models.Student
+
+@{
+    ViewData["Title"] = "Student Details";
+}
+
+<h1><i class="fas fa-user"></i> @Model.Name</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Student Information</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5">Student ID:</dt>
+                    <dd class="col-sm-7">@Model.StudentId</dd>
+
+                    <dt class="col-sm-5">Name:</dt>
+                    <dd class="col-sm-7">@Model.Name</dd>
+
+                    <dt class="col-sm-5">Registered:</dt>
+                    <dd class="col-sm-7">@Model.RegistrationDate.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-5">Last Updated:</dt>
+                    <dd class="col-sm-7">@Model.LastUpdated.ToString("dd/MM/yyyy HH:mm")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header @(Model.IsPassed ? "bg-success" : "bg-danger") text-white">
+                <h5 class="mb-0">Overall Result</h5>
+            </div>
+            <div class="card-body">
+                <h2 class="text-center @Model.ResultClass">@Model.OverallResult</h2>
+                <hr />
+                <dl class="row">
+                    <dt class="col-sm-7">Modules Passed:</dt>
+                    <dd class="col-sm-5">@Model.ModulesPassed/8</dd>
+
+                    <dt class="col-sm-7">Average Mark:</dt>
+                    <dd class="col-sm-5">@Model.AverageMark:F1%</dd>
+
+                    <dt class="col-sm-7">Pass Rate:</dt>
+                    <dd class="col-sm-5">@Model.PassRate:F1%</dd>
+
+                    <dt class="col-sm-7">Highest Mark:</dt>
+                    <dd class="col-sm-5">@Model.HighestMark:F1%</dd>
+
+                    <dt class="col-sm-7">Lowest Mark:</dt>
+                    <dd class="col-sm-5">@Model.LowestMark:F1%</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-book"></i> Module Marks</h5>
+                @if (Model.ModuleMarks.Count < 8)
+                {
+                    <a asp-action="AddMarks" asp-route-id="@Model.Id" class="btn btn-sm btn-light">
+                        <i class="fas fa-plus"></i> Add Module @(Model.ModuleMarks.Count + 1)
+                    </a>
+                }
+            </div>
+            <div class="card-body">
+                @if (!Model.ModuleMarks.Any())
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> No module marks have been entered yet.
+                        <a asp-action="AddMarks" asp-route-id="@Model.Id">Click here to add marks</a>.
+                    </div>
+                }
+                else
+                {
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Module</th>
+                                <th>Mark</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 1; i <= 8; i++)
+                            {
+                                var module = Model.ModuleMarks.FirstOrDefault(m => m.ModuleNumber == i);
+                                <tr>
+                                    <td><strong>Module @i</strong></td>
+                                    @if (module != null)
+                                    {
+                                        <td class="@module.GetStatusClass()">@module.Mark:F1%</td>
+                                        <td>@module.Grade</td>
+                                        <td>
+                                            <span class="badge @(module.IsPassed ? "bg-success" : "bg-danger")">
+                                                @(module.IsPassed ? "PASS" : "FAIL")
+                                            </span>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td colspan="3" class="text-muted">
+                                            <em>Not entered yet</em>
+                                            <a asp-action="AddMarks" asp-route-id="@Model.Id" class="btn btn-sm btn-link">
+                                                Add
+                                            </a>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Edit
+    </a>
+    <a asp-action="Print" asp-route-id="@Model.Id" class="btn btn-secondary" target="_blank">
+        <i class="fas fa-print"></i> Print
+    </a>
+    <a asp-action="Index" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Back to List
+    </a>
+    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger float-end">
+        <i class="fas fa-trash"></i> Delete
+    </a>
+</div>

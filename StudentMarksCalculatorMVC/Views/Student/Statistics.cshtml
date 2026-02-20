@@ -1,0 +1,203 @@
+﻿@model Dictionary<string, object>
+
+@{
+    ViewData["Title"] = "Statistics";
+}
+
+<h1><i class="fas fa-chart-bar"></i> Statistics</h1>
+
+@if ((int)Model["TotalStudents"] == 0)
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> No data available yet.
+        <a asp-action="Create">Add your first student</a> to see statistics.
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Student Overview</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="studentChart" width="400" height="300"></canvas>
+
+                    <table class="table table-striped mt-3">
+                        <tr>
+                            <th>Total Students:</th>
+                            <td>@Model["TotalStudents"]</td>
+                        </tr>
+                        <tr>
+                            <th>Passed:</th>
+                            <td>@Model["TotalPassed"] (@Model["PassRate"]:F1%)</td>
+                        </tr>
+                        <tr>
+                            <th>Failed:</th>
+                            <td>@Model["TotalFailed"] (@(100 - (double)Model["PassRate"]):F1%)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Mark Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="marksChart" width="400" height="300"></canvas>
+
+                    <table class="table table-striped mt-3">
+                        <tr>
+                            <th>Average Mark:</th>
+                            <td>@Model["AverageMark"]:F1%</td>
+                        </tr>
+                        <tr>
+                            <th>Highest Mark:</th>
+                            <td>@Model["HighestMark"]:F1%</td>
+                        </tr>
+                        <tr>
+                            <th>Lowest Mark:</th>
+                            <td>@Model["LowestMark"]:F1%</td>
+                        </tr>
+                        <tr>
+                            <th>Total Modules:</th>
+                            <td>@Model["TotalModules"]</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Summary</h5>
+                </div>
+                <div class="card-body">
+                    @{
+                        var passRate = (double)Model["PassRate"];
+                        var avgMark = (double)Model["AverageMark"];
+                    }
+
+                    <div class="alert @(passRate >= 50 ? "alert-success" : "alert-warning")">
+                        <h5>Overall Performance: @(passRate >= 50 ? "Good" : "Needs Improvement")</h5>
+                        <p>
+                            @if (passRate >= 70)
+                            {
+                                <text>Excellent! The pass rate is very high.</text>
+                            }
+                            else if (passRate >= 50)
+                            {
+                                <text>Satisfactory. The pass rate meets the minimum requirement.</text>
+                            }
+                            else
+                            {
+                                <text>The pass rate is below 50%. Consider reviewing teaching methods or providing additional support.</text>
+                            }
+                        </p>
+                    </div>
+
+                    @if (avgMark >= 70)
+                    {
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" style="width: @avgMark%">Average: @avgMark:F1%</div>
+                        </div>
+                    }
+                    else if (avgMark >= 50)
+                    {
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-warning" style="width: @avgMark%">Average: @avgMark:F1%</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-danger" style="width: @avgMark%">Average: @avgMark:F1%</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Back to Students
+    </a>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Student Chart (Pie chart for pass/fail)
+        var ctx1 = document.getElementById('studentChart').getContext('2d');
+        var studentChart = new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                labels: ['Passed (@Model["TotalPassed"])', 'Failed (@Model["TotalFailed"])'],
+                datasets: [{
+                    data: [@Model["TotalPassed"], @Model["TotalFailed"]],
+                    backgroundColor: ['#28a745', '#dc3545'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Student Pass/Fail Distribution'
+                    }
+                }
+            }
+        });
+
+        // Marks Chart (Bar chart for marks)
+        var ctx2 = document.getElementById('marksChart').getContext('2d');
+        var marksChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Average', 'Highest', 'Lowest'],
+                datasets: [{
+                    label: 'Marks (%)',
+                    data: [@Model["AverageMark"], @Model["HighestMark"], @Model["LowestMark"]],
+                    backgroundColor: ['#17a2b8', '#28a745', '#dc3545'],
+                    borderColor: ['#138496', '#218838', '#c82333'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Percentage (%)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Mark Statistics'
+                    }
+                }
+            }
+        });
+    </script>
+}

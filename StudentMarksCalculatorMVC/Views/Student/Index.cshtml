@@ -1,0 +1,104 @@
+﻿@model IEnumerable<StudentMarksCalculatorMVC.Models.Student>
+
+@{
+    ViewData["Title"] = "Students";
+}
+
+<h1><i class="fas fa-users"></i> Students</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Create New Student
+    </a>
+    <a asp-action="Statistics" class="btn btn-info">
+        <i class="fas fa-chart-bar"></i> View Statistics
+    </a>
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> No students have been added yet.
+        <a asp-action="Create">Click here to add your first student</a>.
+    </div>
+}
+else
+{
+    <table class="table table-hover table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.StudentId)</th>
+                <th>@Html.DisplayNameFor(model => model.Name)</th>
+                <th>@Html.DisplayNameFor(model => model.RegistrationDate)</th>
+                <th>Modules Passed</th>
+                <th>Average</th>
+                <th>Result</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.StudentId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td>@item.RegistrationDate.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (item.ModuleMarks.Any())
+                        {
+                            <span>@item.ModulesPassed/8</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">Not Started</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.ModuleMarks.Any())
+                        {
+                            <span>@item.AverageMark:F1%</span>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.ModuleMarks.Any())
+                        {
+                            <span class="badge @(item.IsPassed ? "bg-success" : "bg-danger")">
+                                @item.OverallResult
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Pending</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            @if (item.ModuleMarks.Count < 8)
+                            {
+                                <a asp-action="AddMarks" asp-route-id="@item.Id" class="btn btn-sm btn-success" title="Add Marks">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            }
+                            <a asp-action="Print" asp-route-id="@item.Id" class="btn btn-sm btn-secondary" title="Print" target="_blank">
+                                <i class="fas fa-print"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

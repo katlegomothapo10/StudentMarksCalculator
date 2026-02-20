@@ -1,0 +1,70 @@
+﻿@model StudentMarksCalculatorMVC.Models.Student
+
+@{
+    ViewData["Title"] = "Create Student";
+}
+
+<h1><i class="fas fa-user-plus"></i> Create New Student</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Student Information</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" placeholder="Enter student full name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Instructions</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success"></i> Enter the student's full name
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success"></i> After creating the student, you'll be able to add marks for all 8 modules
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success"></i> Each module requires a mark between 0-100
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success"></i> Pass mark for each module is 50%
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success"></i> Overall pass requires passing at least 4 modules
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
